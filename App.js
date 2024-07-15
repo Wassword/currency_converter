@@ -1,6 +1,6 @@
 // set up express server 
 const express = require('express');
-const express = require ('axios');
+const axios = require ('axios');
 const app = express();
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize({
