@@ -1,4 +1,4 @@
-//DOM ELEMENT
+//DOM ELEMENT ensures code run only after entire htlm doc is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     const baseCurrencySelect = document.getElementById('base-currency');
     const targetCurrencySelect = document.getElementById('target-currency');
@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // Populate currency dropdowns with example data
-    const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'PKR', 'MYR', 'INR',''];
+    const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'PKR', 'MYR', 'INR','IDR'];
     
     // Iterates over each currency in the currencies array.
     currencies.forEach(currency => {
-        const option1 = document.createElement('option');
+        const option1 = document.createElement('option'); //option element populates dropdowns with a list 
         option1.value = currency;
         option1.text = currency;
         baseCurrencySelect.add(option1);
@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event listener for converting currency
-    document.getElementById('amount').addEventListener('input', convertCurrency);
-    baseCurrencySelect.addEventListener('change', convertCurrency);
+    document.getElementById('amount').addEventListener('input', convertCurrency); //event listener triggers convertCurrency Fn
+    baseCurrencySelect.addEventListener('change', convertCurrency); //whenever smount input or slected currency chnages
     targetCurrencySelect.addEventListener('change', convertCurrency);
 
     function convertCurrency() {
@@ -74,9 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (amount && baseCurrency && targetCurrency) {
             fetch(`https://api.freecurrencyapi.com/v1/latest?base_currency=${baseCurrency}`, requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.data || !data.data[targetCurrency]) {
+                .then(response => response.json()) // Convert the response to JSON
+                .then(data => { //Handle the parsed JSON data
+                    if (!data.data || !data.data[targetCurrency]) { //if the required data is present and then calculates the converted amount. 
                         showError('Failed to fetch the conversion rate.');
                         return;
                     }
@@ -117,13 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 showError('Failed to fetch historical rates. Please try again later.');
             });
     });
-    saveFavoriteButton.addEventListener('click', () => {
+    saveFavoriteButton.addEventListener('click', () => { // fetch request to server save-favourite endpoint 
         const baseCurrency = baseCurrencySelect.value;
         const targetCurrency = targetCurrencySelect.value;
         const favoritePair = `${baseCurrency}/${targetCurrency}`;
 
         fetch('/save-favorite', {
-            method: 'POST', // a fetch POST request to /save-favorite endpoint with headers and body containing favoritePair.
+            method: 'POST', // a fetch POST request to send data to server with headers and body containing favoritePair.
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ favoritePair })
         })
@@ -138,16 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     targetCurrencySelect.value = target;
                     convertCurrency();  // Trigger conversion
                 });
-                favoritesContainer.appendChild(favoriteButton);
+                favoritesContainer.appendChild(favoriteButton); //appends favourite button child element to parent element 
             }
         })
         .catch(error => console.log('error', error));
-        showError('Failed to save favorite pair. Please try again later.');
+        
 
     });
 
     // Fetch and display saved favorites
-    fetch('/favorites')
+    fetch('/favorites') //fetch data from server endpoint favoutires 
         .then(response => response.json())
         .then(favorites => {
             favorites.forEach(favorite => {
