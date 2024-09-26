@@ -1,0 +1,67 @@
+CREATE TABLE Books (
+    BookID INTEGER PRIMARY KEY,
+    Title TEXT NOT NULL,
+    Author TEXT NOT NULL,
+    PublicationYear INTEGER NOT NULL,
+    Price REAL NOT NULL
+);
+
+INSERT INTO Books (Title, Author, PublicationYear, Price) VALUES ('Harry Potter and Sorcerer Stone', 'J.K. Rowling', 1997, 19.99);
+INSERT INTO Books (Title, Author, PublicationYear, Price) VALUES ('The Da Vinci Code', 'Dan Brown', 2003, 15.99);
+INSERT INTO Books (Title, Author, PublicationYear, Price) VALUES ('The Road', 'Cormac McCarthy', 2006, 12.99);
+INSERT INTO Books (Title, Author, PublicationYear, Price) VALUES ('The Girl with the Dragon Tattoo', 'Stieg Larsson', 2005, 14.99);
+INSERT INTO Books (Title, Author, PublicationYear, Price) VALUES ('Life of Pi', 'Yann Martel', 2001, 16.99);
+
+SELECT * FROM Books;
+SELECT * FROM Books WHERE PublicationYear > 2000;
+SELECT * FROM Books WHERE Author = 'Dan Brown';
+UPDATE Books SET Price = 35.00 WHERE Title = 'The Da Vinci Code';
+DELETE FROM Books WHERE Title = 'Life of Pi';
+
+-- New Table
+CREATE TABLE Sales (
+    SaleID INTEGER PRIMARY KEY,
+    BookID INTEGER,
+    SaleDate DATE,
+    Quantity INTEGER,
+    TotalPrice REAL,
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
+
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (1, '2023-09-01', 2, 21.98);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (2, '2023-09-02', 3, 44.97);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (3, '2023-09-03', 1, 12.99);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (4, '2023-09-04', 5, 49.95);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (5, '2023-09-05', 4, 47.96);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (6, '2023-09-06', 2, 41.98);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (7, '2023-09-07', 1, 15.99);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (8, '2023-09-08', 3, 38.97);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (9, '2023-09-09', 2, 29.98);
+INSERT INTO Sales (BookID, SaleDate, Quantity, TotalPrice) VALUES (10, '2023-09-10', 1, 16.99);
+
+-- Retrieve all books that have been sold:
+SELECT DISTINCT b.* FROM Books b JOIN Sales s ON b.BookID = s.BookID;
+
+-- Find the total sales for each book:
+SELECT b.Title, SUM(s.TotalPrice) AS TotalSales
+FROM Books b
+JOIN Sales s ON b.BookID = s.BookID
+GROUP BY b.BookID;
+
+-- Retrieve all books that have never been sold:
+SELECT * FROM Books WHERE BookID NOT IN (SELECT BookID FROM Sales);
+
+-- Find the book with the highest total sales:
+SELECT b.Title, SUM(s.TotalPrice) AS TotalSales FROM Books b JOIN Sales s ON b.BookID = s.BookID GROUP BY b.BookID ORDER BY TotalSales DESC LIMIT 1;
+
+-- For each author, find the total sales of their books:
+SELECT b.Author, SUM(s.TotalPrice) AS TotalSales FROM Books b JOIN Sales s ON b.BookID = s.BookID GROUP BY b.Author;
+
+-- Update the Quantity of a sale record:
+UPDATE Sales SET Quantity = 4 WHERE SaleID = 1;
+
+-- Delete a sale record:
+DELETE FROM Sales WHERE SaleID = 2;
+
+-- Update the Price of a book based on its sales performance:
+UPDATE Books SET Price = Price * 0.9 WHERE BookID IN (SELECT BookID FROM Sales GROUP BY BookID HAVING SUM(TotalPrice) < 100);
